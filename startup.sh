@@ -1,7 +1,5 @@
 #! /bin/bash
 
-pip install -e /response
-
 wait_for_db()
 {
     while ! nc -z ${DB_HOST:-db} ${DB_PORT:-5432};
