@@ -1,7 +1,5 @@
 #! /bin/bash
 
-pip install -e /response
-
 wait_for_db()
 {
     while ! nc -z ${DB_HOST:-db} ${DB_PORT:-5432};
@@ -16,7 +14,7 @@ from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 User = get_user_model()
 try:
-    User.objects.create_superuser('admin', '', 'admin')
+    User.objects.create_superuser('$ADMIN_USER', '', '$ADMIN_PASS')
 except IntegrityError:
     pass
 EOF
