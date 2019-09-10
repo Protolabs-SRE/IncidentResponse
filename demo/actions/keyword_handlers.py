@@ -15,3 +15,4 @@ def status_page_notification(comms_channel: CommsChannel, user: str, text: str, 
 @keyword_handler(['run book', 'runbook', 'runbooks', 'run books', 'play book', 'playbook', 'play book', 'playbooks'])
 def status_page_notification(comms_channel: CommsChannel, user: str, text: str, ts: str):
     comms_channel.post_in_channel(f"ℹ️ You mentioned playbook(s) - <{settings.PLAYBOOKS_URL}|here's the playbook(s)> location.")
+
