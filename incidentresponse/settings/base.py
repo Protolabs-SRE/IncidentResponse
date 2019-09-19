@@ -111,10 +111,6 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIR = [
-    os.path.join(BASE_DIR, "static"),
-    "static"
-]
 
 # Django Rest Framework
 # https://www.django-rest-framework.org/
