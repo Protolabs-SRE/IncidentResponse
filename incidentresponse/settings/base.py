@@ -111,7 +111,10 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static'
+STATICFILES_DIR = [
+    os.path.join(BASE_DIR, "static"),
+    "static"
+]
 
 # Django Rest Framework
 # https://www.django-rest-framework.org/
@@ -156,11 +159,10 @@ MARKDOWN_FILTER_WHITELIST_STYLES = [
 
 def get_env_var(setting, warn_only=False, default=None):
     value = os.getenv(setting, default)
-
-    if not value and default is None:
+    if not value:
         error_msg = f"ImproperlyConfigured: Set {setting} environment variable"
         if warn_only:
-            logger.warn(error_msg)
+            logger.warning(error_msg)
         else:
             raise ImproperlyConfigured(error_msg)
     else:
@@ -181,39 +183,4 @@ INCIDENT_CHANNEL_ID = get_env_var("INCIDENT_CHANNEL_ID", default=SLACK_CLIENT.ge
 STATUS_PAGE_PLAYBOOK_URL = get_env_var("STATUS_PAGE_PLAYBOOK_URL")
 PLAYBOOKS_URL = get_env_var("PLAYBOOKS_URL")
 
-# dirty hackery is afoot here. This is modifying monzo's channel create functionality to be our own
-from response.slack.models.comms_channel import CommsChannelManager
-from urllib.parse import urljoin
-from django.urls import reverse
-import time
-from response.slack.client import SlackError
-from response.slack.block_kit import *
 
-
-def create_incident_our_way(self, incident):
-    """Creates a comms channel in slack, and saves a reference to it in the DB"""
-    try:
-        timestamp = time.strftime("%Y%m%d-%H%M%S")
-        name = f"inc-{timestamp}"
-        channel_id = settings.SLACK_CLIENT.get_or_create_channel(name, auto_unarchive=True)
-    except SlackError as e:
-        logger.error('Failed to create comms channel {e}')
-
-    try:
-        doc_url = urljoin(
-            settings.SITE_URL,
-            reverse('incident_doc', kwargs={'incident_id': incident.pk})
-        )
-
-        settings.SLACK_CLIENT.set_channel_topic(channel_id, f"{incident.report} - {doc_url}")
-    except SlackError as e:
-        logger.error('Failed to set channel topic {e}')
-
-    comms_channel = self.create(
-        incident=incident,
-        channel_id=channel_id,
-    )
-    return comms_channel
-
-
-CommsChannelManager.create_comms_channel = create_incident_our_way
