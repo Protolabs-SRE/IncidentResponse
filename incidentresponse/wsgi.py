@@ -24,7 +24,7 @@ def create_incident_our_way(self, incident):
     """Creates a comms channel in slack, and saves a reference to it in the DB"""
     logger = logging.getLevelName("protolabs.custom.slackchannelcreator")
     try:
-        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
         name = f"inc-{timestamp}"
         channel_id = settings.SLACK_CLIENT.get_or_create_channel(name, auto_unarchive=True)
     except SlackError as e:
