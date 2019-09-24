@@ -5,13 +5,13 @@ from django.core.exceptions import ImproperlyConfigured
 
 # load from the environment 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -20,7 +20,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-
 
 # Application definition
 
@@ -67,7 +66,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'incidentresponse.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -77,7 +75,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -97,7 +94,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -111,13 +107,10 @@ USE_L10N = True
 
 USE_TZ = False
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static'
-
 
 # Django Rest Framework
 # https://www.django-rest-framework.org/
@@ -159,13 +152,13 @@ MARKDOWN_FILTER_WHITELIST_STYLES = [
     'margin-bottom', 'margin-left', 'margin-right', 'margin-top'
 ]
 
-def get_env_var(setting, warn_only=False):
-    value = os.getenv(setting, None)
 
+def get_env_var(setting, warn_only=False, default=None):
+    value = os.getenv(setting, default)
     if not value:
         error_msg = f"ImproperlyConfigured: Set {setting} environment variable"
         if warn_only:
-            logger.warn(error_msg)
+            logger.warning(error_msg)
         else:
             raise ImproperlyConfigured(error_msg)
     else:
@@ -173,5 +166,17 @@ def get_env_var(setting, warn_only=False):
 
     return value
 
+
+SITE_URL = get_env_var("SITE_URL", default="http://localhost:8000")
 SLACK_TOKEN = get_env_var("SLACK_TOKEN")
 SLACK_CLIENT = SlackClient(SLACK_TOKEN)
+SLACK_SIGNING_SECRET = get_env_var("SLACK_SIGNING_SECRET")
+INCIDENT_CHANNEL_NAME = get_env_var("INCIDENT_CHANNEL_NAME")
+INCIDENT_BOT_NAME = get_env_var("INCIDENT_BOT_NAME")
+SECRET_KEY = get_env_var("SECRET_KEY")
+INCIDENT_BOT_ID = get_env_var("INCIDENT_BOT_ID", default=SLACK_CLIENT.get_user_id(INCIDENT_BOT_NAME))
+INCIDENT_CHANNEL_ID = get_env_var("INCIDENT_CHANNEL_ID", default=SLACK_CLIENT.get_channel_id(INCIDENT_CHANNEL_NAME))
+STATUS_PAGE_PLAYBOOK_URL = get_env_var("STATUS_PAGE_PLAYBOOK_URL")
+PLAYBOOKS_URL = get_env_var("PLAYBOOKS_URL")
+
+
