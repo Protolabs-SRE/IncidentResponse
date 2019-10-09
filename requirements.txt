@@ -1,4 +1,4 @@
 Django==2.2.4
 psycopg2-binary==2.8.2
-django-incident-response==0.1.7
+django-incident-response==0.1.14
 python-dotenv==0.10.3
